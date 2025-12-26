@@ -8,7 +8,6 @@ gameWidth = 1000
 gameHeight = 600
 isPlaying = True
 gameState = "start"
-mousePos = pygame.mouse.get_pos()
 
 window = pygame.display.set_mode((gameWidth, gameHeight))
 pygame.display.set_caption("game for jessica! :)")
@@ -29,6 +28,7 @@ def loadImages():
 
 images = loadImages()
 playRect = images['play1'].get_rect(center=(gameWidth//2, gameHeight//2 + 100))
+playPressed = False
 
 titleFont = pygame.font.Font("assets/pixelifySans.ttf", 70)
 textFont = pygame.font.Font("assets/pixelifySans.ttf", 30)
@@ -47,8 +47,8 @@ def startScreen():
     subtitleText = textFont.render('Merry Christmas, Jessica! :D', True, (84, 26, 69))
     subtitleRect = subtitleText.get_rect(center=(gameWidth//2, 290))
     window.blit(subtitleText, subtitleRect)
-    playHover = playRect.collidepoint(mousePos)
-    currentButton = images['play2'] if playHover else images['play1']
+
+    currentButton = images['play2'] if playPressed else images['play1']
     window.blit(currentButton, playRect)
 
 def draw():
@@ -57,10 +57,22 @@ def draw():
             startScreen()
 
 while isPlaying:
+    mousePos = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if gameState == "start":
+                if playRect.collidepoint(mousePos):
+                    playPressed = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            if gameState == "start" and playPressed:
+                if playRect.collidepoint(mousePos):
+                    playPressed = False
+                    gameState = "play"
+                    window.blit(images['play1'], playRect)
+
     draw()
     pygame.display.update()
     clock.tick(60)
