@@ -2,6 +2,7 @@ import pygame
 import os
 import random
 from sys import exit
+import asyncio
 
 pygame.init()
 
@@ -192,43 +193,48 @@ def draw():
         case "win":
             winScreen()
 
-while isPlaying:
-    mousePos = pygame.mouse.get_pos()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if gameState == "start":
-                if playRect.collidepoint(mousePos):
-                    playPressed = True
-            if gameState == "intro":
-                gameState = "play"
-        if event.type == pygame.MOUSEBUTTONUP:
-            if gameState == "start" and playPressed:
-                if playRect.collidepoint(mousePos):
-                    playPressed = False
+async def main():
+    global isPlaying, gameState, playPressed, cupX, score, fallingObjects, winLatte
+    while isPlaying:
+        mousePos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if gameState == "start":
+                    if playRect.collidepoint(mousePos):
+                        playPressed = True
+                if gameState == "intro":
+                    gameState = "play"
+            if event.type == pygame.MOUSEBUTTONUP:
+                if gameState == "start" and playPressed:
+                    if playRect.collidepoint(mousePos):
+                        playPressed = False
+                        gameState = "intro"
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r and gameState == "win":
+                    score = 0
+                    fallingObjects = []
+                    cupX = gameWidth // 2
+                    winLatte = None
                     gameState = "intro"
         
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_r and gameState == "win":
-                score = 0
-                fallingObjects = []
-                cupX = gameWidth // 2
-                winLatte = None
-                gameState = "intro"
-    
-    keys = pygame.key.get_pressed()
-    if gameState == "play":
-        if keys[pygame.K_LEFT]:
-                cupX -= 5
-        if keys[pygame.K_RIGHT]:
-                cupX += 5
-        if cupX < 50:
-            cupX = 50
-        if cupX > gameWidth - 50:
-            cupX = gameWidth - 50
+        keys = pygame.key.get_pressed()
+        if gameState == "play":
+            if keys[pygame.K_LEFT]:
+                    cupX -= 5
+            if keys[pygame.K_RIGHT]:
+                    cupX += 5
+            if cupX < 50:
+                cupX = 50
+            if cupX > gameWidth - 50:
+                cupX = gameWidth - 50
 
-    draw()
-    pygame.display.update()
-    clock.tick(60)
+        draw()
+        pygame.display.update()
+        clock.tick(60)
+        await asyncio.sleep(0)
+
+asyncio.run(main())
