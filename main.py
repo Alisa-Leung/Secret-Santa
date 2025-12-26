@@ -99,7 +99,7 @@ def playScreen():
     scoreRect = scoreText.get_rect(topleft=(10, 10))
     window.blit(scoreText, scoreRect)
 
-    cup = images['latte7'].get_rect(center=(gameWidth//2, gameHeight - 100))
+    cup = images['latte7'].get_rect(center=(cupX, gameHeight - 100))
     window.blit(images['latte7'], cup)
 
 def draw():
@@ -129,11 +129,16 @@ while isPlaying:
                     playPressed = False
                     gameState = "intro"
                     window.blit(images['play1'], playRect)
-        keys = pygame.key.get_pressed()
+    keys = pygame.key.get_pressed()
+    if gameState == "play":
         if keys[pygame.K_LEFT]:
-                cupX -= 10
+                cupX -= 5
         if keys[pygame.K_RIGHT]:
-                cupX += 10
+                cupX += 5
+        if cupX < 50:
+            cupX = 50
+        if cupX > gameWidth - 50:
+            cupX = gameWidth - 50
 
     draw()
     pygame.display.update()
