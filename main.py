@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 from sys import exit
 
 pygame.init()
@@ -91,16 +92,66 @@ def introScreen():
 
 cupX = gameWidth // 2
 
+fallingObjects = []
+spawnTimer = 0
+spawnDelay = 60
+score = 0
+
+objectTypes = {
+    'bean': {'image': 'beans', 'points': 10, 'speed': 5},
+    'creamer': {'image': 'creamer', 'points': 15, 'speed': 5},
+    'chiikawa': {'image': 'chiikawa', 'points': -20, 'speed': 5},
+    'kirby': {'image': 'kirby', 'points': -15, 'speed': 5}
+}
+
+class FallingObject:
+    def __init__(self, x, y, objType):
+        self.x = x
+        self.y = y
+        self.type = objType
+        self.image = images[objectTypes[objType]['image']]
+        self.points = objectTypes[objType]['points']
+        self.speed = objectTypes[objType]['speed']
+
+    def update(self):
+        self.y += self.speed
+
+    def isOffScreen(self):
+        self.y += self.speed
+    
+    def getRect(self):
+        return pygame.Rect(self.x - 25, self.y - 25, 50, 50)
+
 def playScreen():
-    global cupX
+    global cupX, spawnTimer, fallingObjects, score
+
     scrollBackground()
-    score = 0
     scoreText = textFont.render(f'Score: {score}', True, (84, 26, 69))
     scoreRect = scoreText.get_rect(topleft=(10, 10))
     window.blit(scoreText, scoreRect)
 
     cup = images['latte7'].get_rect(center=(cupX, gameHeight - 100))
     window.blit(images['latte7'], cup)
+
+    spawnTimer += 1
+    if spawnTimer >= spawnDelay:
+        spawnTimer = 0
+        randomX = random.randint(50, gameWidth - 50)
+        randomType = random.choice(['bean', 'bean', 'bean', 'creamer', 'creamer', 'chiikawa', 'kirby'])
+        fallingObjects.append(FallingObject(randomX, -50, randomType))
+
+    for obj in fallingObjects[:]:
+        obj.update()
+        objRect = obj.getRect()
+        if cup.colliderect(objRect):
+            score += obj.points
+            fallingObjects.remove(obj)
+            continue
+        if obj.isOffScreen():
+            fallingObjects.remove(obj)
+            continue
+        objImage = images[objectTypes[obj.type]['image']]
+        window.blit(objImage, (obj.x - 25, obj.y - 25))
 
 def draw():
     match gameState:
