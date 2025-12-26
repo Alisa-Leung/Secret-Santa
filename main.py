@@ -17,22 +17,22 @@ icon = pygame.image.load('assets/catLatte.png')
 pygame.display.set_icon(icon)
 
 def loadImages():
+    images = {}
     for fileName in os.listdir("assets/"):
         if fileName.endswith('.png'):
             path = os.path.join("assets/", fileName)
             image = pygame.image.load(path).convert_alpha()
-            key.os.path.splittext(fileName)[0]
+            key = os.path.splitext(fileName)[0]
             images[key] = image
-        return images
+    return images
 
 images = loadImages()
-print(images)
 
 titleFont = pygame.font.Font("assets/pixelifySans.ttf", 70)
 textFont = pygame.font.Font("assets/pixelifySans.ttf", 30)
 
 def draw():
-    print("test")
+    print(images)
 
 while isPlaying:
     for event in pygame.event.get():
